@@ -12,3 +12,8 @@ export const actionTypes: { [prop: string]: string } = {
   CHANGE_FRAMERATE: 'CHANGE_FRAMERATE',
   FRAME: 'frame',
 };
+
+export type ActionFunc = (payload: number) => Action;
+export type Action =
+  | { type: typeof actionTypes.SET_ACTIVE_TOOL; payload: number }
+  | { type: typeof actionTypes.SET_COLOR; payload: number };

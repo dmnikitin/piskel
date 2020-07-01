@@ -1,6 +1,6 @@
-import { actionTypes } from '../action-types';
+import { actionTypes, ActionFunc } from '../action-types';
 
-const setActiveTool = (value) => ({
+const setActiveTool: ActionFunc = (value: number) => ({
   type: actionTypes.SET_ACTIVE_TOOL,
   payload: value,
 });

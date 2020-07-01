@@ -1,14 +1,14 @@
-import { combineReducers } from 'redux';
-import ToolsReducer from './tools';
-import FramesReducer from './frames';
-import ButtonsReducer from './buttons';
-import FrameRateReducer from './frameRate';
+import { combineReducers, Reducer, CombinedState, AnyAction } from 'redux';
+import { toolsReducer } from './tools';
+import { ActiveState } from './../../assets/data';
 
-const combined = combineReducers({
-  tools: ToolsReducer,
-  frames: FramesReducer,
-  buttons: ButtonsReducer,
-  frameRate: FrameRateReducer,
+const combined: Reducer<
+  CombinedState<{
+    tools: ActiveState;
+  }>,
+  AnyAction
+> = combineReducers({
+  tools: toolsReducer,
 });
 
 export default combined;
