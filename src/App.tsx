@@ -1,11 +1,13 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Canvas from './components/canvas/canvas';
+import ToolsBox from './components/toolsbox/tools-box';
+import './App.scss';
 
-function App() {
+function App(): React.ReactElement {
   return (
     <div className="App">
-  
+      <Canvas />
+      <ToolsBox />
     </div>
   );
 }

@@ -16,17 +16,18 @@ enum colors {
   '#d98200',
   '#760fbf',
 }
-enum colorsRGBA {
-  '#e3e4e6' = '227228230255',
-  '#000000' = '000255',
-  '#ffffff' = '255255255255',
-  // 3: '#d61818',
-  // 4: '#13c219',
-  // 5: '#0249ba',
-  // 6: '#d5d900',
-  // 7: '#d98200',
-  // 8: '#760fbf',
-}
+
+const colorsRGBA: Array<string> = [
+  '2272282301',
+  '0000',
+  '2552552551',
+  '21424241',
+  '19194251',
+  '2731861',
+  '21321701',
+  '21713001',
+  '118151911',
+];
 
 enum tools {
   pen,
@@ -37,17 +38,48 @@ enum tools {
   allToOneColor,
 }
 
-interface ActiveState {
-  colors: { primaryColor: string; alternativeColor: string };
-  activeTool: number;
-}
-
-const active: ActiveState = {
-  colors: {
-    primaryColor: colors[1],
-    alternativeColor: colors[0],
-  },
+const toolstState: ToolsState = {
+  primaryColor: colors[1],
+  alternativeColor: colors[0],
   activeTool: tools.pen,
 };
 
-export { colors, colorsRGBA, tools, active, mouseEvents };
+interface Dimensions {
+  coeff: { [prop: string]: number };
+  canvas: { [prop: string]: number };
+  pen: { [prop: string]: number };
+  pixel: { [prop: string]: number };
+}
+
+const dimensions: Dimensions = {
+  coeff: {
+    basic: 1,
+    fullPage: 0.5,
+    preview: 4,
+  },
+  canvas: {
+    small: 128,
+    medium: 512,
+    large: 1024,
+  },
+  pen: {
+    small: 1,
+    medium: 2,
+    large: 3,
+  },
+  pixel: {
+    medium: 32,
+  },
+};
+
+export interface ToolsState {
+  primaryColor: string;
+  alternativeColor: string;
+  activeTool: number;
+}
+
+export interface ActiveState {
+  tools: ToolsState;
+}
+
+export { colors, colorsRGBA, tools, mouseEvents, toolstState, dimensions };
