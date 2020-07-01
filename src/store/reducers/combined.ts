@@ -1,10 +1,10 @@
 import { combineReducers, Reducer, CombinedState, AnyAction } from 'redux';
 import { toolsReducer } from './tools';
-import { ActiveState } from './../../assets/data';
+import { ToolsState } from './../../assets/data';
 
 const combined: Reducer<
   CombinedState<{
-    tools: ActiveState;
+    tools: ToolsState;
   }>,
   AnyAction
 > = combineReducers({

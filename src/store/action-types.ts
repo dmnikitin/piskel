@@ -1,5 +1,6 @@
 export const actionTypes: { [prop: string]: string } = {
-  SET_COLOR: 'SET_COLOR',
+  SET_PRIMARY_COLOR: 'SET_PRIMARY_COLOR',
+  SET_ALTERNATIVE_COLOR: 'SET_ALTERNATIVE_COLOR',
   SET_ACTIVE_TOOL: 'SET_ACTIVE_TOOL',
   SET_PEN_SIZE: 'SET_PEN_SIZE',
   SET_CANVAS_SIZE: 'SET_CANVAS_SIZE',
@@ -13,7 +14,6 @@ export const actionTypes: { [prop: string]: string } = {
   FRAME: 'frame',
 };
 
-export type ActionFunc = (payload: number) => Action;
 export type Action =
   | { type: typeof actionTypes.SET_ACTIVE_TOOL; payload: number }
-  | { type: typeof actionTypes.SET_COLOR; payload: number };
+  | { type: typeof actionTypes.SET_PRIMARY_COLOR; payload: string };

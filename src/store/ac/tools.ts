@@ -1,8 +1,13 @@
-import { actionTypes, ActionFunc } from '../action-types';
+import { actionTypes, Action } from '../action-types';
 
-const setActiveTool: ActionFunc = (value: number) => ({
+const setActiveTool: (value: number) => Action = (value) => ({
   type: actionTypes.SET_ACTIVE_TOOL,
   payload: value,
 });
 
-export { setActiveTool };
+const setPrimaryColor: (value: string) => Action = (value) => ({
+  type: actionTypes.SET_PRIMARY_COLOR,
+  payload: value,
+});
+
+export { setActiveTool, setPrimaryColor };
