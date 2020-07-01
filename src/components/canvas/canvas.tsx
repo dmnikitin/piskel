@@ -1,64 +1,103 @@
-import React, {ReactElement, MouseEvent, MutableRefObject, useRef} from 'react';
+import React, {
+  ReactElement,
+  MouseEvent,
+  MutableRefObject,
+  useRef,
+  useEffect,
+} from 'react';
+import { connect } from 'react-redux';
+import { dimensions, colors, colorsRGBA, ToolsState } from '../../assets/data';
+import { ActiveState } from '../../assets/data';
 import './canvas.scss';
 
 type CanvasElement = HTMLCanvasElement | null;
+type CanvasContext = CanvasRenderingContext2D | null;
 type CanvasRef = MutableRefObject<CanvasElement>;
-type getCanvasMetaDataFunc = (canvasRef: CanvasRef) => CanvasMetaData;
-type detectCurrentPixelFunc = (e: MouseEvent) => number;
-type drawFunc = (canvasRef: CanvasRef) => (e: MouseEvent) => void;
+type GetCanvasMetaDataFunc = (canvasRef: CanvasRef) => CanvasMetaData;
+type DetectCurrentPixelFunc = (e: MouseEvent<HTMLCanvasElement>) => number;
+type DrawFunc = (e: MouseEvent<HTMLCanvasElement>) => void;
+type DrawPixelFunc = (ctx: CanvasContext, pixel: number, color: string) => void;
 interface CanvasMetaData {
   canvas: CanvasElement;
-  ctx: CanvasRenderingContext2D | null;
+  ctx: CanvasContext;
 }
 
-const pixelSize = 32;
+const {
+  pixel: { medium: pixelSize },
+  canvas: { medium: canvasSize },
+} = dimensions;
 
-const drawPixel: (ctx: CanvasRenderingContext2D | null, pixel: number) => void = (ctx, pixel) => {
-
-  const x: number = (pixel % pixelSize) * 16;
-  const y: number = Math.floor(pixel / pixelSize) * 16;  
+const drawPixel: DrawPixelFunc = (ctx, pixel, color) => {
+  const x: number = (pixel % pixelSize) * (pixelSize / 2);
+  const y: number = Math.floor(pixel / pixelSize) * (pixelSize / 2);
   if (ctx) {
-    const p = ctx.getImageData(x, y, 1, 1).data.join('');    
-    const black = '000255';    
-    if (p !== black) {
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(x, y, 16, 16);
-      console.log('draw');
+    const imageData: Uint8ClampedArray = ctx.getImageData(x, y, 1, 1).data;
+    const index: number = colorsRGBA.findIndex(
+      (e) =>
+        e ===
+        `${imageData[0]}${imageData[1]}${imageData[2]}${imageData[3] / 255}`
+    );
+    if (colors[index] !== color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, pixelSize / 2, pixelSize / 2);
     }
   }
-}
-
-const detectCurrentPixel: detectCurrentPixelFunc = (e) => {
-  const { nativeEvent: { offsetX: x, offsetY: y } } = e;
-  return pixelSize * Math.floor(y / (pixelSize / 2)) + Math.floor(x / (pixelSize / 2));
 };
 
-const getCanvasMetaData: getCanvasMetaDataFunc = (canvasRef) => {
-  const { current: canvas }  = canvasRef;
-  const ctx: CanvasRenderingContext2D | null = (canvas as HTMLCanvasElement).getContext('2d');
+const detectCurrentPixel: DetectCurrentPixelFunc = (e) => {
+  const {
+    nativeEvent: { offsetX: x, offsetY: y },
+  } = e;
+  return (
+    pixelSize * Math.floor(y / (pixelSize / 2)) +
+    Math.floor(x / (pixelSize / 2))
+  );
+};
+
+const getCanvasMetaData: GetCanvasMetaDataFunc = (ref) => {
+  const { current: canvas } = ref;
+  const ctx: CanvasContext = canvas ? canvas.getContext('2d') : null;
   return { canvas, ctx };
 };
 
-function Canvas(): ReactElement {
+function Canvas(props: ToolsState): ReactElement {
+  const { activeTool, alternativeColor, primaryColor } = props;
+  const canvasRef: CanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const canvasRef: CanvasRef = useRef(null);
+  useEffect(() => {
+    const { ctx } = getCanvasMetaData(canvasRef);
+    if (ctx) {
+      ctx.fillStyle = colors[2];
+      ctx.fillRect(0, 0, canvasSize, canvasSize);
+    }
+  }, []);
 
-  const draw: drawFunc = (ref) => (e) => {
-    const {ctx}: CanvasMetaData = getCanvasMetaData(ref);
+  const draw: DrawFunc = (e) => {
+    // ref
+    const { ctx } = getCanvasMetaData(canvasRef);
     const pixel: number = detectCurrentPixel(e);
-    drawPixel(ctx, pixel);
+    drawPixel(ctx, pixel, primaryColor);
+  };
+
+  const actionHandler = (e: MouseEvent<HTMLCanvasElement>) => {
+    const { ctx } = getCanvasMetaData(canvasRef);
+    const pixel: number = detectCurrentPixel(e);
   };
 
   return (
-    <div className='canvas'>
+    <div className="canvas">
       <canvas
-        height={512}
-        width={512}
+        height={canvasSize}
+        width={canvasSize}
         ref={canvasRef}
-        onClick={draw(canvasRef)}
+        onClick={draw}
       ></canvas>
     </div>
   );
 }
 
-export default Canvas;
+export default connect((state: ActiveState) => ({
+  primaryColor: state.tools.primaryColor,
+  alternativeColor: state.tools.alternativeColor,
+  activeTool: state.tools.activeTool,
+}))(Canvas);
