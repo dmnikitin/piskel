@@ -27,6 +27,79 @@ const {
   canvas: { medium: canvasSize },
 } = dimensions;
 
+const useStroke = (ctx, x1, y1, x2, y2) => {
+  let x;
+  let y;
+  let xDominant;
+  let yDominant;
+  let iterator;
+  const deltaX = x2 - x1;
+  const deltaY = y2 - y1;
+  const positiveDeltaX = Math.abs(deltaX);
+  const positiveDeltaY = Math.abs(deltaY);
+  let errorIntervalX = 2 * positiveDeltaY - positiveDeltaX;
+  let errorIntervalY = 2 * positiveDeltaX - positiveDeltaY;
+
+  if (positiveDeltaY <= positiveDeltaX) {
+    if (deltaX >= 0) {
+      x = x1;
+      y = y1;
+      xDominant = x2;
+    } else {
+      x = x2;
+      y = y2;
+      xDominant = x1;
+    }
+
+    const e = { layerX: x, layerY: y };
+    usePen(e, ctx, primaryColor);
+
+    for (iterator = 0; x < xDominant; iterator += 1) {
+      x += 1;
+      if (errorIntervalX < 0) {
+        errorIntervalX += 2 * positiveDeltaY;
+      } else {
+        if ((deltaX < 0 && deltaY < 0) || (deltaX > 0 && deltaY > 0)) {
+          y += 1;
+        } else {
+          y -= 1;
+        }
+        errorIntervalX += 2 * (positiveDeltaY - positiveDeltaX);
+      }
+      const e2 = { layerX: x, layerY: y };
+      usePen(e2, ctx, primaryColor);
+    }
+  } else {
+    if (deltaY >= 0) {
+      x = x1;
+      y = y1;
+      yDominant = y2;
+    } else {
+      x = x2;
+      y = y2;
+      yDominant = y1;
+    }
+    const e = { layerX: x, layerY: y };
+    usePen(e, ctx, primaryColor);
+
+    for (iterator = 0; y < yDominant; iterator += 1) {
+      y += 1;
+      if (errorIntervalY <= 0) {
+        errorIntervalY += 2 * positiveDeltaX;
+      } else {
+        if ((deltaX < 0 && deltaY < 0) || (deltaX > 0 && deltaY > 0)) {
+          x += 1;
+        } else {
+          x -= 1;
+        }
+        errorIntervalY += 2 * (positiveDeltaX - positiveDeltaY);
+      }
+      const e2 = { layerX: x, layerY: y };
+      usePen(e2, ctx, primaryColor);
+    }
+  }
+};
+
 const drawPixel: DrawPixelFunc = (ctx, pixel, color) => {
   const x: number = (pixel % pixelSize) * (pixelSize / 2);
   const y: number = Math.floor(pixel / pixelSize) * (pixelSize / 2);
